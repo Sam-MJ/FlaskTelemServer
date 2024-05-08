@@ -1,8 +1,10 @@
-from app import app
 from flask import request
 from pydantic import ValidationError
 from app.model import Transaction
 import json
+from app.database import db_write
+
+from app import app
 
 
 @app.route("/")
@@ -22,8 +24,6 @@ def save_transaction():
     try:
         t = Transaction(
             session_id=data["session_id"],
-            hashed_ip=data["hashed_ip"],
-            hashed_mac=data["hashed_mac"],
             files_created=data["files_created"],
             files_scanned=data["files_scanned"],
             session_start=data["session_start"],
@@ -31,6 +31,8 @@ def save_transaction():
         )
     except ValidationError as e:
         print(e)
-        return f"400 - {e}"
+        return f"400 - {e}"  # - DEBUG ONLY! in production don't give more information
+
+    db_write(t)
 
     return "201 - Transaction Created"

@@ -3,6 +3,7 @@ from flask import g
 
 from pathlib import Path
 import sqlite3
+from sqlite3 import DatabaseError
 
 
 DATABASE = Path(
@@ -28,21 +29,29 @@ def close_connection(exception):
 
 def db_write(transaction):
     db = get_db()
+    print("write")
     try:
         cur = db.cursor()
         cur.execute(
-            "INSERT INTO transactions (session_id, hashed_ip, hashed_mac, files_created, files_scanned, session_start, session_end) VALUES (?,?,?,?,?,?,?)",
+            "UPDATE transactions SET files_created = files_created + 1, session_end = ? WHERE session_id = ?;",
             (
-                transaction.session_id,
-                transaction.hashed_ip,
-                transaction.hashed_mac,
-                transaction.files_created,
-                transaction.files_scanned,
-                transaction.session_start,
                 transaction.session_end,
+                transaction.session_id,
             ),
         )
+
+        if cur.rowcount == 0:
+            cur.execute(
+                "INSERT INTO transactions (session_id, files_created, files_scanned, session_start, session_end) VALUES (?,?,?,?,?);",
+                (
+                    transaction.session_id,
+                    transaction.files_created,
+                    transaction.files_scanned,
+                    transaction.session_start,
+                    transaction.session_end,
+                ),
+            )
         db.commit()
-    except:
+    except DatabaseError:
         db.rollback()
         return "500 - Database Error"
