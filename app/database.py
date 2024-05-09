@@ -33,8 +33,10 @@ def db_write(transaction):
     try:
         cur = db.cursor()
         cur.execute(
-            "UPDATE transactions SET files_created = files_created + 1, session_end = ? WHERE session_id = ?;",
+            "UPDATE transactions SET files_created = ?, files_scanned = ?, session_end = ? WHERE session_id = ?;",
             (
+                transaction.files_created,
+                transaction.files_scanned,
                 transaction.session_end,
                 transaction.session_id,
             ),
@@ -54,4 +56,4 @@ def db_write(transaction):
         db.commit()
     except DatabaseError:
         db.rollback()
-        return "500 - Database Error"
+        raise DatabaseError

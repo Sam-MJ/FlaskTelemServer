@@ -3,6 +3,7 @@ from pydantic import ValidationError
 from app.model import Transaction
 import json
 from app.database import db_write
+from sqlite3 import DatabaseError
 
 from app import app
 
@@ -13,14 +14,14 @@ def hello():
 
 
 @app.post("/SausageFileConverterTransactions")
-def save_transaction():
+def receive_transaction():
     content_type = request.headers.get("Content-Type")
     print(content_type)
     data = request.json
     data = json.loads(data)
     print(data["session_id"])
 
-    # validate inputs
+    # validate inputs with pydantic model
     try:
         t = Transaction(
             session_id=data["session_id"],
@@ -30,9 +31,13 @@ def save_transaction():
             session_end=data["session_end"],
         )
     except ValidationError as e:
-        print(e)
-        return f"400 - {e}"  # - DEBUG ONLY! in production don't give more information
+        return (
+            f"400"  # - {e}"  # - DEBUG ONLY! in production don't give more information
+        )
 
-    db_write(t)
+    try:
+        db_write(t)
+    except DatabaseError:
+        return "500 - Internal Error"
 
     return "201 - Transaction Created"
