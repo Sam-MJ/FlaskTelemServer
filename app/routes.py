@@ -24,6 +24,8 @@ def receive_transaction():
     # validate inputs with pydantic model
     try:
         t = Transaction(
+            telem_version=data["telem_version"],
+            product_id=data["product_id"],
             session_id=data["session_id"],
             files_created=data["files_created"],
             files_scanned=data["files_scanned"],

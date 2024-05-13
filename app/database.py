@@ -44,8 +44,10 @@ def db_write(transaction):
 
         if cur.rowcount == 0:
             cur.execute(
-                "INSERT INTO transactions (session_id, files_created, files_scanned, session_start, session_end) VALUES (?,?,?,?,?);",
+                "INSERT INTO transactions (telem_version, product_id, session_id, files_created, files_scanned, session_start, session_end) VALUES (?,?,?,?,?,?,?);",
                 (
+                    transaction.telem_version,
+                    transaction.product_id,
                     transaction.session_id,
                     transaction.files_created,
                     transaction.files_scanned,
