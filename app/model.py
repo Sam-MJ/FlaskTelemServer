@@ -26,5 +26,5 @@ class Transaction(BaseModel):
     def hex_str(cls, word):
         """Check string is a hex"""
         if not word.startswith("0x"):
-            raise ValidationError("The game word must only contain letters")
+            raise ValidationError("Not a hex string")
         return word
