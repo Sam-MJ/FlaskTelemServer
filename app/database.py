@@ -1,3 +1,4 @@
+import os
 from app import app
 from flask import g
 
@@ -6,9 +7,7 @@ import sqlite3
 from sqlite3 import DatabaseError
 
 
-DATABASE = Path(
-    r"D:\Documents\Programming_stuff\Python_projects\FlaskTelemServer\SausageDB.db"
-)
+DATABASE = os.environ["DATABASE_PATH"]
 
 
 def get_db():
@@ -44,10 +43,11 @@ def db_write(transaction):
 
         if cur.rowcount == 0:
             cur.execute(
-                "INSERT INTO transactions (telem_version, product_id, session_id, files_created, files_scanned, session_start, session_end) VALUES (?,?,?,?,?,?,?);",
+                "INSERT INTO transactions (telem_version, ip_address, mac_address, session_id, files_created, files_scanned, session_start, session_end) VALUES (?,?,?,?,?,?,?,?);",
                 (
                     transaction.telem_version,
-                    transaction.product_id,
+                    str(transaction.ip_address),
+                    transaction.mac_address,
                     transaction.session_id,
                     transaction.files_created,
                     transaction.files_scanned,

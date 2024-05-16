@@ -13,7 +13,7 @@ def hello():
     return "<p>Hello, World!</p>"
 
 
-@app.post("/SausageFileConverterTransactions")
+@app.post("/sausagefileconverter-transactions")
 def receive_transaction():
     content_type = request.headers.get("Content-Type")
     print(content_type)
@@ -25,7 +25,8 @@ def receive_transaction():
     try:
         t = Transaction(
             telem_version=data["telem_version"],
-            product_id=data["product_id"],
+            ip_address=data["ip_address"],
+            mac_address=data["mac_address"],
             session_id=data["session_id"],
             files_created=data["files_created"],
             files_scanned=data["files_scanned"],
@@ -33,6 +34,7 @@ def receive_transaction():
             session_end=data["session_end"],
         )
     except ValidationError as e:
+        print(e)
         return (
             f"400"  # - {e}"  # - DEBUG ONLY! in production don't give more information
         )
@@ -40,6 +42,7 @@ def receive_transaction():
     try:
         db_write(t)
     except DatabaseError:
+        print("DB Error")
         return "500 - Internal Error"
 
     return "201 - Transaction Created"
