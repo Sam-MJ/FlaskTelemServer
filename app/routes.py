@@ -16,6 +16,8 @@ def hello():
 @app.post("/sausagefileconverter-transactions")
 def receive_transaction():
     content_type = request.headers.get("Content-Type")
+    ip_address = request.remote_addr
+
     print(content_type)
     data = request.json
     data = json.loads(data)
@@ -25,7 +27,7 @@ def receive_transaction():
     try:
         t = Transaction(
             telem_version=data["telem_version"],
-            ip_address=data["ip_address"],
+            ip_address=ip_address,
             mac_address=data["mac_address"],
             session_id=data["session_id"],
             files_created=data["files_created"],
