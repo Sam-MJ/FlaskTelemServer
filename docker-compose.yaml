@@ -1,0 +1,10 @@
+services:
+  app:
+    build: ./app
+    command: flask run -h 0.0.0.0
+    volumes:
+      - ./app :/usr/src/app/
+    ports: # runs on port 5001 of the host machine and 5000 inside the docker container
+      - 5001:5000
+    env_file:
+      - ./.env.dev

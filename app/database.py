@@ -11,6 +11,7 @@ DATABASE = os.environ["DATABASE_PATH"]
 
 
 def get_db():
+    """get database from global application context, if it doesn't exist create a new connection and return it."""
     db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
@@ -20,6 +21,7 @@ def get_db():
 
 @app.teardown_appcontext
 def close_connection(exception):
+    """once a request has finished, if a database has been opened, close it."""
     db = getattr(g, "_database", None)
     if db is not None:
         db.close()
