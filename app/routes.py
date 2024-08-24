@@ -15,6 +15,7 @@ def hello():
 
 @app.post("/sausagefileconverter-transactions")
 def receive_transaction():
+    """Recieve request, validate inputs by populating a pydantic model, if successful, write to the db"""
     content_type = request.headers.get("Content-Type")
     ip_address = request.remote_addr
 

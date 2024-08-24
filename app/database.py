@@ -2,7 +2,6 @@ import os
 from app import app
 from flask import g
 
-from pathlib import Path
 import sqlite3
 from sqlite3 import DatabaseError
 
@@ -13,6 +12,7 @@ DATABASE = os.environ["DATABASE_PATH"]
 def get_db():
     """get database from global application context, if it doesn't exist create a new connection and return it."""
     db = getattr(g, "_database", None)
+
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
         print("open db")
@@ -23,14 +23,20 @@ def get_db():
 def close_connection(exception):
     """once a request has finished, if a database has been opened, close it."""
     db = getattr(g, "_database", None)
+
     if db is not None:
         db.close()
         print("close db")
 
 
 def db_write(transaction):
+    """Write to db.
+    If there is an existing entry for this session, update it
+    If not, create an entry
+    """
     db = get_db()
     print("write")
+
     try:
         cur = db.cursor()
         cur.execute(
